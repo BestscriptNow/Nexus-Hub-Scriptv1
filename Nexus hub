@@ -1,0 +1,1927 @@
+--[[
+    ⚡ NEXUS HUB | PREMIUM FREE SCRIPT
+    BLACK & SILVER | THEME SELECTOR EDITION
+
+    Creator / Developer : Chae
+    Promoter            : Den
+]]
+
+--==================================================
+-- SERVICES
+--==================================================
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Stats = game:GetService("Stats")
+
+local LocalPlayer = Players.LocalPlayer
+
+--==================================================
+-- UI PARENT
+--==================================================
+
+local function GetUIParent()
+    if gethui then
+        return gethui()
+    elseif syn and syn.protect_gui then
+        return game:GetService("CoreGui")
+    else
+        return LocalPlayer:WaitForChild("PlayerGui")
+    end
+end
+
+local UIParent = GetUIParent()
+
+pcall(function()
+    local old = UIParent:FindFirstChild("NexusHubUI")
+    if old then
+        old:Destroy()
+    end
+end)
+
+--==================================================
+-- THEME SYSTEM
+--==================================================
+
+local Themes = {
+    ["Night Blue"] = {
+        Accent = Color3.fromRGB(70,150,255),
+        AccentDark = Color3.fromRGB(25,75,145),
+        Glow = Color3.fromRGB(80,170,255),
+        Border = Color3.fromRGB(145,190,255)
+    },
+
+    ["Red"] = {
+        Accent = Color3.fromRGB(235,55,70),
+        AccentDark = Color3.fromRGB(130,25,35),
+        Glow = Color3.fromRGB(255,75,85),
+        Border = Color3.fromRGB(255,150,155)
+    },
+
+    ["White"] = {
+        Accent = Color3.fromRGB(245,245,248),
+        AccentDark = Color3.fromRGB(150,150,155),
+        Glow = Color3.fromRGB(255,255,255),
+        Border = Color3.fromRGB(255,255,255)
+    },
+
+    ["Yellow"] = {
+        Accent = Color3.fromRGB(245,195,55),
+        AccentDark = Color3.fromRGB(150,110,20),
+        Glow = Color3.fromRGB(255,215,75),
+        Border = Color3.fromRGB(255,225,130)
+    },
+
+    ["Green"] = {
+        Accent = Color3.fromRGB(65,220,125),
+        AccentDark = Color3.fromRGB(25,130,70),
+        Glow = Color3.fromRGB(75,235,140),
+        Border = Color3.fromRGB(145,255,185)
+    },
+
+    ["Purple"] = {
+        Accent = Color3.fromRGB(175,90,255),
+        AccentDark = Color3.fromRGB(90,35,145),
+        Glow = Color3.fromRGB(195,110,255),
+        Border = Color3.fromRGB(220,170,255)
+    }
+}
+
+local CurrentThemeName = "Night Blue"
+
+local Theme = {
+    Background = Color3.fromRGB(3,3,4),
+    Background2 = Color3.fromRGB(8,8,10),
+
+    Sidebar = Color3.fromRGB(6,6,7),
+
+    Card = Color3.fromRGB(12,12,14),
+    Card2 = Color3.fromRGB(17,17,19),
+
+    Button = Color3.fromRGB(12,12,14),
+    ButtonHover = Color3.fromRGB(28,28,31),
+
+    White = Color3.fromRGB(255,255,255),
+    Silver = Color3.fromRGB(195,195,200),
+    Gray = Color3.fromRGB(145,145,150),
+    DarkGray = Color3.fromRGB(90,90,95),
+
+    Green = Color3.fromRGB(80,220,135),
+    Red = Color3.fromRGB(220,50,60),
+
+    Border = Color3.fromRGB(145,190,255),
+    Accent = Color3.fromRGB(70,150,255),
+    AccentDark = Color3.fromRGB(25,75,145),
+    Glow = Color3.fromRGB(80,170,255)
+}
+
+--==================================================
+-- UTILITIES
+--==================================================
+
+local function Tween(obj,time,props)
+    local info = TweenInfo.new(
+        time,
+        Enum.EasingStyle.Quart,
+        Enum.EasingDirection.Out
+    )
+
+    local tween = TweenService:Create(obj,info,props)
+    tween:Play()
+
+    return tween
+end
+
+local function Corner(obj,radius)
+    local c = Instance.new("UICorner")
+
+    c.CornerRadius = UDim.new(
+        0,
+        radius or 8
+    )
+
+    c.Parent = obj
+
+    return c
+end
+
+local function WhiteStroke(obj,transparency)
+    local s = Instance.new("UIStroke")
+
+    s.Color = Theme.Border
+    s.Thickness = 1
+    s.Transparency = transparency or 0
+    s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    s.Parent = obj
+
+    return s
+end
+
+local function ThemeStroke(obj)
+    local stroke = obj:FindFirstChildOfClass("UIStroke")
+
+    if stroke then
+        stroke.Color = Theme.Border
+    end
+end
+
+--==================================================
+-- SCREEN GUI
+--==================================================
+
+local ScreenGui = Instance.new("ScreenGui")
+
+ScreenGui.Name = "NexusHubUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = UIParent
+
+--==================================================
+-- LOADING
+--==================================================
+
+local LoadingFrame = Instance.new("Frame")
+
+LoadingFrame.Size = UDim2.fromOffset(470,245)
+LoadingFrame.Position = UDim2.fromScale(0.5,0.5)
+LoadingFrame.AnchorPoint = Vector2.new(0.5,0.5)
+LoadingFrame.BackgroundColor3 = Theme.Background
+LoadingFrame.BorderSizePixel = 0
+LoadingFrame.Parent = ScreenGui
+
+Corner(LoadingFrame,14)
+WhiteStroke(LoadingFrame)
+
+local LoadingTitle = Instance.new("TextLabel")
+
+LoadingTitle.BackgroundTransparency = 1
+LoadingTitle.Size = UDim2.new(1,-40,0,40)
+LoadingTitle.Position = UDim2.fromOffset(20,16)
+LoadingTitle.Font = Enum.Font.GothamMedium
+LoadingTitle.Text = "⚡ NEXUS HUB"
+LoadingTitle.TextColor3 = Theme.White
+LoadingTitle.TextSize = 32
+LoadingTitle.Parent = LoadingFrame
+
+local LoadingSub = Instance.new("TextLabel")
+
+LoadingSub.BackgroundTransparency = 1
+LoadingSub.Size = UDim2.new(1,-40,0,24)
+LoadingSub.Position = UDim2.fromOffset(20,56)
+LoadingSub.Font = Enum.Font.GothamMedium
+LoadingSub.Text = "PREMIUM FREE SCRIPT"
+LoadingSub.TextColor3 = Theme.Silver
+LoadingSub.TextSize = 14
+LoadingSub.Parent = LoadingFrame
+
+local LoadingStatus = Instance.new("TextLabel")
+
+LoadingStatus.BackgroundTransparency = 1
+LoadingStatus.Size = UDim2.new(1,-40,0,28)
+LoadingStatus.Position = UDim2.fromOffset(20,91)
+LoadingStatus.Font = Enum.Font.GothamMedium
+LoadingStatus.Text = "Initializing..."
+LoadingStatus.TextColor3 = Theme.Silver
+LoadingStatus.TextSize = 15
+LoadingStatus.TextXAlignment = Enum.TextXAlignment.Left
+LoadingStatus.Parent = LoadingFrame
+
+local LoadingBarBG = Instance.new("Frame")
+
+LoadingBarBG.Size = UDim2.new(1,-40,0,8)
+LoadingBarBG.Position = UDim2.fromOffset(20,130)
+LoadingBarBG.BackgroundColor3 = Color3.fromRGB(27,27,30)
+LoadingBarBG.BorderSizePixel = 0
+LoadingBarBG.Parent = LoadingFrame
+
+Corner(LoadingBarBG,5)
+WhiteStroke(LoadingBarBG,0.35)
+
+local LoadingBar = Instance.new("Frame")
+
+LoadingBar.Size = UDim2.new(0,0,1,0)
+LoadingBar.BackgroundColor3 = Theme.Accent
+LoadingBar.BorderSizePixel = 0
+LoadingBar.Parent = LoadingBarBG
+
+Corner(LoadingBar,5)
+
+local LoadingPercent = Instance.new("TextLabel")
+
+LoadingPercent.BackgroundTransparency = 1
+LoadingPercent.Size = UDim2.new(1,-40,0,28)
+LoadingPercent.Position = UDim2.fromOffset(20,151)
+LoadingPercent.Font = Enum.Font.GothamMedium
+LoadingPercent.Text = "0%"
+LoadingPercent.TextColor3 = Theme.White
+LoadingPercent.TextSize = 15
+LoadingPercent.TextXAlignment = Enum.TextXAlignment.Right
+LoadingPercent.Parent = LoadingFrame
+
+--==================================================
+-- MAIN FRAME
+--==================================================
+
+local MainFrame = Instance.new("Frame")
+
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.fromOffset(800,500)
+MainFrame.Position = UDim2.fromScale(0.5,0.5)
+MainFrame.AnchorPoint = Vector2.new(0.5,0.5)
+MainFrame.BackgroundColor3 = Theme.Background
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = false
+MainFrame.Parent = ScreenGui
+
+Corner(MainFrame,12)
+WhiteStroke(MainFrame)
+
+--==================================================
+-- MOBILE SCALE
+--==================================================
+
+local MainScale = Instance.new("UIScale")
+
+MainScale.Scale = 1
+MainScale.Parent = MainFrame
+
+local Camera = workspace.CurrentCamera
+
+local function UpdateMobileScale()
+    Camera = workspace.CurrentCamera
+
+    if not Camera then
+        return
+    end
+
+    local viewport = Camera.ViewportSize
+
+    local widthScale = (viewport.X - 16) / 800
+    local heightScale = (viewport.Y - 16) / 500
+
+    local scale = math.min(widthScale, heightScale, 1)
+
+    MainScale.Scale = math.max(scale, 0.35)
+end
+
+UpdateMobileScale()
+
+if Camera then
+    Camera:GetPropertyChangedSignal("ViewportSize"):Connect(UpdateMobileScale)
+end
+
+--==================================================
+-- HEADER
+--==================================================
+
+local Header = Instance.new("Frame")
+
+Header.Size = UDim2.new(1,0,0,70)
+Header.BackgroundColor3 = Theme.Background
+Header.BorderSizePixel = 0
+Header.Parent = MainFrame
+
+Corner(Header,12)
+
+local HeaderCover = Instance.new("Frame")
+
+HeaderCover.Size = UDim2.new(1,0,0,30)
+HeaderCover.Position = UDim2.fromOffset(0,40)
+HeaderCover.BackgroundColor3 = Theme.Background
+HeaderCover.BorderSizePixel = 0
+HeaderCover.Parent = Header
+
+local Title = Instance.new("TextLabel")
+
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.fromOffset(430,32)
+Title.Position = UDim2.fromOffset(18,7)
+Title.Font = Enum.Font.GothamMedium
+Title.Text = "⚡ NEXUS HUB | PREMIUM FREE SCRIPT"
+Title.TextColor3 = Theme.White
+Title.TextSize = 18
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.ZIndex = 20
+Title.Parent = Header
+
+local TitleSub = Instance.new("TextLabel")
+
+TitleSub.BackgroundTransparency = 1
+TitleSub.Size = UDim2.fromOffset(260,20)
+TitleSub.Position = UDim2.fromOffset(19,38)
+TitleSub.Font = Enum.Font.GothamMedium
+TitleSub.Text = "PREMIUM FREE SCRIPT"
+TitleSub.TextColor3 = Theme.Silver
+TitleSub.TextSize = 11
+TitleSub.TextXAlignment = Enum.TextXAlignment.Left
+TitleSub.ZIndex = 20
+TitleSub.Parent = Header
+
+local TitleLine = Instance.new("Frame")
+
+TitleLine.Size = UDim2.fromOffset(140,2)
+TitleLine.Position = UDim2.fromOffset(18,57)
+TitleLine.BackgroundColor3 = Theme.Accent
+TitleLine.BorderSizePixel = 0
+TitleLine.ZIndex = 20
+TitleLine.Parent = Header
+
+Corner(TitleLine,3)
+
+--==================================================
+-- FPS / PING
+--==================================================
+
+local StatusLabel = Instance.new("TextLabel")
+
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Size = UDim2.fromOffset(145,24)
+StatusLabel.Position = UDim2.new(1,-245,0,17)
+StatusLabel.Font = Enum.Font.GothamMedium
+StatusLabel.Text = "FPS: --  |  Ping: --"
+StatusLabel.TextColor3 = Theme.Silver
+StatusLabel.TextSize = 11
+StatusLabel.TextXAlignment = Enum.TextXAlignment.Right
+StatusLabel.ZIndex = 20
+StatusLabel.Parent = Header
+
+--==================================================
+-- MINIMIZE
+--==================================================
+
+local Minimize = Instance.new("TextButton")
+
+Minimize.Size = UDim2.fromOffset(38,38)
+Minimize.Position = UDim2.new(1,-88,0,10)
+Minimize.BackgroundColor3 = Theme.Card
+Minimize.BorderSizePixel = 0
+Minimize.Text = "—"
+Minimize.Font = Enum.Font.GothamMedium
+Minimize.TextColor3 = Theme.White
+Minimize.TextSize = 18
+Minimize.AutoButtonColor = false
+Minimize.ZIndex = 30
+Minimize.Parent = Header
+
+Corner(Minimize,8)
+WhiteStroke(Minimize,0.15)
+
+--==================================================
+-- CLOSE
+--==================================================
+
+local Close = Instance.new("TextButton")
+
+Close.Size = UDim2.fromOffset(38,38)
+Close.Position = UDim2.new(1,-44,0,10)
+Close.BackgroundColor3 = Theme.Red
+Close.BorderSizePixel = 0
+Close.Text = "×"
+Close.Font = Enum.Font.GothamMedium
+Close.TextColor3 = Theme.White
+Close.TextSize = 19
+Close.AutoButtonColor = false
+Close.ZIndex = 30
+Close.Parent = Header
+
+Corner(Close,8)
+WhiteStroke(Close,0.15)
+
+--==================================================
+-- DRAG
+--==================================================
+
+local Dragging = false
+local DragStart
+local StartPos
+
+Header.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        Dragging = true
+        DragStart = input.Position
+        StartPos = MainFrame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                Dragging = false
+            end
+        end)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if Dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local Delta = input.Position - DragStart
+
+        MainFrame.Position = UDim2.new(
+            StartPos.X.Scale,
+            StartPos.X.Offset + Delta.X,
+            StartPos.Y.Scale,
+            StartPos.Y.Offset + Delta.Y
+        )
+    end
+end)
+
+--==================================================
+-- SIDEBAR & CONTENT SETUP
+--==================================================
+
+local Sidebar = Instance.new("Frame")
+
+Sidebar.Size = UDim2.new(0,220,1,-86)
+Sidebar.Position = UDim2.fromOffset(12,72)
+Sidebar.BackgroundColor3 = Theme.Sidebar
+Sidebar.BorderSizePixel = 0
+Sidebar.Parent = MainFrame
+
+Corner(Sidebar,8)
+WhiteStroke(Sidebar,0.25)
+
+local ContentWrapper = Instance.new("Frame")
+
+ContentWrapper.Size = UDim2.new(1,-244,1,-86)
+ContentWrapper.Position = UDim2.fromOffset(232,72)
+ContentWrapper.BackgroundTransparency = 1
+ContentWrapper.Parent = MainFrame
+
+local Content = Instance.new("ScrollingFrame")
+
+Content.Size = UDim2.new(1,0,1,0)
+Content.BackgroundTransparency = 1
+Content.BorderSizePixel = 0
+Content.ScrollBarThickness = 3
+Content.ScrollBarImageColor3 = Color3.fromRGB(170,170,175)
+Content.AutomaticCanvasSize = Enum.AutomaticSize.Y
+Content.CanvasSize = UDim2.new(0,0,0,0)
+Content.Parent = ContentWrapper
+
+local ContentPadding = Instance.new("UIPadding")
+
+ContentPadding.PaddingLeft = UDim.new(0,4)
+ContentPadding.PaddingRight = UDim.new(0,4)
+ContentPadding.PaddingTop = UDim.new(0,4)
+ContentPadding.PaddingBottom = UDim.new(0,8)
+ContentPadding.Parent = Content
+
+local ContentLayout = Instance.new("UIListLayout")
+
+ContentLayout.Padding = UDim.new(0,8)
+ContentLayout.Parent = Content
+
+--==================================================
+-- TABS & PAGES
+--==================================================
+
+local Tabs = {}
+local Pages = {}
+
+local function CreateTab(name,icon)
+    local Button = Instance.new("TextButton")
+
+    Button.Size = UDim2.new(1,-24,0,40)
+    Button.BackgroundColor3 = Theme.Sidebar
+    Button.BorderSizePixel = 0
+    Button.Text = ""
+    Button.AutoButtonColor = false
+    Button.Parent = Sidebar
+
+    Corner(Button,7)
+    WhiteStroke(Button,0.35)
+
+    local Icon = Instance.new("TextLabel")
+
+    Icon.BackgroundTransparency = 1
+    Icon.Size = UDim2.fromOffset(32,32)
+    Icon.Position = UDim2.fromOffset(8,4)
+    Icon.Text = icon
+    Icon.TextSize = 16
+    Icon.Font = Enum.Font.Gotham
+    Icon.Parent = Button
+
+    local Text = Instance.new("TextLabel")
+
+    Text.BackgroundTransparency = 1
+    Text.Size = UDim2.new(1,-45,1,0)
+    Text.Position = UDim2.fromOffset(43,0)
+    Text.Font = Enum.Font.GothamMedium
+    Text.Text = name
+    Text.TextColor3 = Theme.Silver
+    Text.TextSize = 11
+    Text.TextXAlignment = Enum.TextXAlignment.Left
+    Text.Parent = Button
+
+    return Button
+end
+
+local HomeTab = CreateTab("Home","🏠")
+HomeTab.Position = UDim2.fromOffset(12,10)
+
+local ScriptTab = CreateTab("Script","📜")
+ScriptTab.Position = UDim2.fromOffset(12,55)
+
+local AvatarTab = CreateTab("Avatar Changer","👤")
+AvatarTab.Position = UDim2.fromOffset(12,100)
+
+local AntiHitTab = CreateTab("Anti Hit","🛡")
+AntiHitTab.Position = UDim2.fromOffset(12,145)
+
+local AntiLagTab = CreateTab("Anti Lag","⚡")
+AntiLagTab.Position = UDim2.fromOffset(12,190)
+
+local ServerTab = CreateTab("Server Finder","🔎")
+ServerTab.Position = UDim2.fromOffset(12,235)
+
+local ShaderTab = CreateTab("Shaders","🌆")
+ShaderTab.Position = UDim2.fromOffset(12,280)
+
+Tabs = {
+    Home = HomeTab,
+    Script = ScriptTab,
+    Avatar = AvatarTab,
+    AntiHit = AntiHitTab,
+    AntiLag = AntiLagTab,
+    Server = ServerTab,
+    Shader = ShaderTab
+}
+
+local function CreatePage()
+    local Page = Instance.new("Frame")
+
+    Page.Size = UDim2.new(1,0,1,0)
+    Page.BackgroundTransparency = 1
+    Page.Visible = false
+    Page.Parent = Content
+
+    return Page
+end
+
+Pages.Home = CreatePage()
+Pages.Script = CreatePage()
+Pages.Avatar = CreatePage()
+Pages.AntiHit = CreatePage()
+Pages.AntiLag = CreatePage()
+Pages.Server = CreatePage()
+Pages.Shader = CreatePage()
+
+--==================================================
+-- HOME SCROLL
+--==================================================
+
+local HomeScroll = Instance.new("ScrollingFrame")
+
+HomeScroll.Name = "HomeScroll"
+HomeScroll.Size = UDim2.new(1,0,1,0)
+HomeScroll.Position = UDim2.fromOffset(0,0)
+HomeScroll.BackgroundTransparency = 1
+HomeScroll.BorderSizePixel = 0
+
+HomeScroll.ScrollBarThickness = 4
+HomeScroll.ScrollBarImageColor3 = Color3.fromRGB(170,170,175)
+
+HomeScroll.ScrollingDirection = Enum.ScrollingDirection.Y
+HomeScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+HomeScroll.CanvasSize = UDim2.new(0,0,0,0)
+
+HomeScroll.Parent = Pages.Home
+
+local HomePadding = Instance.new("UIPadding")
+
+HomePadding.PaddingRight = UDim.new(0,5)
+HomePadding.PaddingBottom = UDim.new(0,12)
+HomePadding.Parent = HomeScroll
+
+--==================================================
+-- SELECT TAB
+--==================================================
+
+local function SelectTab(tabName)
+    for name,button in pairs(Tabs) do
+        local active = name == tabName
+
+        Tween(button,0.15,{
+            BackgroundColor3 = active and Color3.fromRGB(235,235,238) or Theme.Sidebar
+        })
+
+        for _,child in ipairs(button:GetChildren()) do
+            if child:IsA("TextLabel") then
+                child.TextColor3 = active and Color3.fromRGB(10,10,12) or Theme.Silver
+            end
+        end
+    end
+
+    for name,page in pairs(Pages) do
+        page.Visible = name == tabName
+    end
+end
+
+--==================================================
+-- HOME PAGE CONTENT
+--==================================================
+
+local HomeTitle = Instance.new("TextLabel")
+
+HomeTitle.BackgroundTransparency = 1
+HomeTitle.Size = UDim2.new(1,-10,0,42)
+HomeTitle.Position = UDim2.fromOffset(5,5)
+HomeTitle.Font = Enum.Font.GothamMedium
+HomeTitle.Text = "⚡  NEXUS HUB"
+HomeTitle.TextColor3 = Theme.White
+HomeTitle.TextSize = 21
+HomeTitle.TextXAlignment = Enum.TextXAlignment.Left
+HomeTitle.Parent = HomeScroll
+
+local HomeSub = Instance.new("TextLabel")
+
+HomeSub.BackgroundTransparency = 1
+HomeSub.Size = UDim2.new(1,-10,0,28)
+HomeSub.Position = UDim2.fromOffset(5,40)
+HomeSub.Font = Enum.Font.GothamMedium
+HomeSub.Text = "Welcome to the official NEXUS HUB dashboard."
+HomeSub.TextColor3 = Theme.Silver
+HomeSub.TextSize = 11
+HomeSub.TextXAlignment = Enum.TextXAlignment.Left
+HomeSub.Parent = HomeScroll
+
+-- Discord Card
+local DiscordCard = Instance.new("Frame")
+
+DiscordCard.Size = UDim2.new(1,-10,0,92)
+DiscordCard.Position = UDim2.fromOffset(5,70)
+DiscordCard.BackgroundColor3 = Theme.Card
+DiscordCard.BorderSizePixel = 0
+DiscordCard.Parent = HomeScroll
+
+Corner(DiscordCard,9)
+WhiteStroke(DiscordCard)
+
+local DiscordName = Instance.new("TextLabel")
+
+DiscordName.BackgroundTransparency = 1
+DiscordName.Size = UDim2.new(1,-24,0,25)
+DiscordName.Position = UDim2.fromOffset(12,10)
+DiscordName.Font = Enum.Font.GothamMedium
+DiscordName.Text = "💬  NEXUS HUB Discord"
+DiscordName.TextColor3 = Theme.White
+DiscordName.TextSize = 15
+DiscordName.TextXAlignment = Enum.TextXAlignment.Left
+DiscordName.Parent = DiscordCard
+
+local DiscordInfo = Instance.new("TextLabel")
+
+DiscordInfo.BackgroundTransparency = 1
+DiscordInfo.Size = UDim2.new(1,-24,0,20)
+DiscordInfo.Position = UDim2.fromOffset(12,34)
+DiscordInfo.Font = Enum.Font.GothamMedium
+DiscordInfo.Text = "Official community • updates • support"
+DiscordInfo.TextColor3 = Theme.Silver
+DiscordInfo.TextSize = 10
+DiscordInfo.TextXAlignment = Enum.TextXAlignment.Left
+DiscordInfo.Parent = DiscordCard
+
+local DiscordButton = Instance.new("TextButton")
+
+DiscordButton.Size = UDim2.new(1,-24,0,32)
+DiscordButton.Position = UDim2.fromOffset(12,54)
+DiscordButton.BackgroundColor3 = Color3.fromRGB(235,235,238)
+DiscordButton.BorderSizePixel = 0
+DiscordButton.Text = "JOIN DISCORD"
+DiscordButton.TextColor3 = Color3.fromRGB(10,10,12)
+DiscordButton.Font = Enum.Font.GothamMedium
+DiscordButton.TextSize = 11
+DiscordButton.AutoButtonColor = false
+DiscordButton.Parent = DiscordCard
+
+Corner(DiscordButton,7)
+WhiteStroke(DiscordButton)
+
+DiscordButton.MouseButton1Click:Connect(function()
+    local invite = "https://discord.gg/R87UFsSKSP"
+
+    if setclipboard then
+        pcall(function()
+            setclipboard(invite)
+        end)
+        DiscordButton.Text = "COPIED DISCORD LINK"
+    else
+        DiscordButton.Text = "discord.gg/R87UFsSKSP"
+    end
+
+    task.wait(1.5)
+    DiscordButton.Text = "JOIN DISCORD"
+end)
+
+-- Creator Card
+local CreatorCard = Instance.new("Frame")
+
+CreatorCard.Size = UDim2.new(1,-10,0,82)
+CreatorCard.Position = UDim2.fromOffset(5,170)
+CreatorCard.BackgroundColor3 = Theme.Card
+CreatorCard.BorderSizePixel = 0
+CreatorCard.Parent = HomeScroll
+
+Corner(CreatorCard,9)
+WhiteStroke(CreatorCard)
+
+local CreatorTitle = Instance.new("TextLabel")
+
+CreatorTitle.BackgroundTransparency = 1
+CreatorTitle.Size = UDim2.new(1,-20,0,25)
+CreatorTitle.Position = UDim2.fromOffset(10,10)
+CreatorTitle.Font = Enum.Font.GothamMedium
+CreatorTitle.Text = "👑  CREATOR / DEVELOPER"
+CreatorTitle.TextColor3 = Theme.White
+CreatorTitle.TextSize = 13
+CreatorTitle.TextXAlignment = Enum.TextXAlignment.Left
+CreatorTitle.Parent = CreatorCard
+
+local CreatorName = Instance.new("TextLabel")
+
+CreatorName.BackgroundTransparency = 1
+CreatorName.Size = UDim2.new(1,-20,0,25)
+CreatorName.Position = UDim2.fromOffset(10,42)
+CreatorName.Font = Enum.Font.GothamMedium
+CreatorName.Text = "Chae"
+CreatorName.TextColor3 = Theme.Silver
+CreatorName.TextSize = 13
+CreatorName.TextXAlignment = Enum.TextXAlignment.Left
+CreatorName.Parent = CreatorCard
+
+-- Promoter Card
+local PromoterCard = Instance.new("Frame")
+
+PromoterCard.Size = UDim2.new(1,-10,0,82)
+PromoterCard.Position = UDim2.fromOffset(5,260)
+PromoterCard.BackgroundColor3 = Theme.Card
+PromoterCard.BorderSizePixel = 0
+PromoterCard.Parent = HomeScroll
+
+Corner(PromoterCard,9)
+WhiteStroke(PromoterCard)
+
+local PromoterTitle = Instance.new("TextLabel")
+
+PromoterTitle.BackgroundTransparency = 1
+PromoterTitle.Size = UDim2.new(1,-20,0,25)
+PromoterTitle.Position = UDim2.fromOffset(10,10)
+PromoterTitle.Font = Enum.Font.GothamMedium
+PromoterTitle.Text = "📢  PROMOTER"
+PromoterTitle.TextColor3 = Theme.White
+PromoterTitle.TextSize = 13
+PromoterTitle.TextXAlignment = Enum.TextXAlignment.Left
+PromoterTitle.Parent = PromoterCard
+
+local PromoterName = Instance.new("TextLabel")
+
+PromoterName.BackgroundTransparency = 1
+PromoterName.Size = UDim2.new(1,-20,0,25)
+PromoterName.Position = UDim2.fromOffset(10,42)
+PromoterName.Font = Enum.Font.GothamMedium
+PromoterName.Text = "Den"
+PromoterName.TextColor3 = Theme.Silver
+PromoterName.TextSize = 13
+PromoterName.TextXAlignment = Enum.TextXAlignment.Left
+PromoterName.Parent = PromoterCard
+
+-- Theme Selector
+local ThemeCard = Instance.new("Frame")
+
+ThemeCard.Size = UDim2.new(1,-10,0,150)
+ThemeCard.Position = UDim2.fromOffset(5,350)
+ThemeCard.BackgroundColor3 = Theme.Card
+ThemeCard.BorderSizePixel = 0
+ThemeCard.Parent = HomeScroll
+
+Corner(ThemeCard,9)
+WhiteStroke(ThemeCard)
+
+local ThemeTitle = Instance.new("TextLabel")
+
+ThemeTitle.BackgroundTransparency = 1
+ThemeTitle.Size = UDim2.new(1,-20,0,25)
+ThemeTitle.Position = UDim2.fromOffset(10,10)
+ThemeTitle.Font = Enum.Font.GothamMedium
+ThemeTitle.Text = "🎨  UI THEME"
+ThemeTitle.TextColor3 = Theme.White
+ThemeTitle.TextSize = 14
+ThemeTitle.TextXAlignment = Enum.TextXAlignment.Left
+ThemeTitle.Parent = ThemeCard
+
+local ThemeInfo = Instance.new("TextLabel")
+
+ThemeInfo.BackgroundTransparency = 1
+ThemeInfo.Size = UDim2.new(1,-20,0,20)
+ThemeInfo.Position = UDim2.fromOffset(10,35)
+ThemeInfo.Font = Enum.Font.GothamMedium
+ThemeInfo.Text = "Choose an accent theme for NEXUS HUB."
+ThemeInfo.TextColor3 = Theme.Silver
+ThemeInfo.TextSize = 10
+ThemeInfo.TextXAlignment = Enum.TextXAlignment.Left
+ThemeInfo.Parent = ThemeCard
+
+local ThemeNames = {
+    "Night Blue",
+    "Red",
+    "White",
+    "Yellow",
+    "Green",
+    "Purple"
+}
+
+local ThemeIcons = {
+    ["Night Blue"] = "🌙",
+    ["Red"] = "🔴",
+    ["White"] = "⚪",
+    ["Yellow"] = "🟡",
+    ["Green"] = "🟢",
+    ["Purple"] = "🟣"
+}
+
+local ThemeChoices = {}
+
+for i,name in ipairs(ThemeNames) do
+    local Choice = Instance.new("TextButton")
+
+    Choice.Size = UDim2.new(0.30,0,0,38)
+
+    local row = math.floor((i-1)/3)
+    local col = (i-1)%3
+
+    Choice.Position = UDim2.new(
+        0.03 + col * 0.325,
+        0,
+        0,
+        62 + row * 43
+    )
+
+    Choice.BackgroundColor3 = Theme.Background2
+    Choice.BorderSizePixel = 0
+    Choice.Text = ThemeIcons[name].."  "..name
+    Choice.TextColor3 = Theme.Silver
+    Choice.Font = Enum.Font.GothamMedium
+    Choice.TextSize = 10
+    Choice.AutoButtonColor = false
+    Choice.Parent = ThemeCard
+
+    Corner(Choice,7)
+    WhiteStroke(Choice,0.15)
+
+    ThemeChoices[name] = Choice
+end
+
+--==================================================
+-- APPLY THEME FUNCTION
+--==================================================
+
+local function ApplyTheme(name)
+    local data = Themes[name]
+
+    if not data then
+        return
+    end
+
+    CurrentThemeName = name
+
+    Theme.Accent = data.Accent
+    Theme.AccentDark = data.AccentDark
+    Theme.Glow = data.Glow
+    Theme.Border = data.Border
+
+    TitleLine.BackgroundColor3 = Theme.Accent
+
+    if LoadingBar then
+        LoadingBar.BackgroundColor3 = Theme.Accent
+    end
+
+    for themeName,choice in pairs(ThemeChoices) do
+        local active = themeName == name
+
+        choice.BackgroundColor3 = active and Theme.AccentDark or Theme.Background2
+        choice.TextColor3 = active and Theme.White or Theme.Silver
+
+        ThemeStroke(choice)
+    end
+
+    for _,obj in ipairs(ScreenGui:GetDescendants()) do
+        if obj:IsA("UIStroke") then
+            obj.Color = Theme.Border
+        end
+    end
+
+    for _,obj in ipairs(ScreenGui:GetDescendants()) do
+        if obj:IsA("Frame") and obj.Name == "AccentLine" then
+            obj.BackgroundColor3 = Theme.Accent
+        end
+    end
+end
+
+for name,choice in pairs(ThemeChoices) do
+    choice.MouseButton1Click:Connect(function()
+        ApplyTheme(name)
+    end)
+end
+
+--==================================================
+-- SCRIPT DATA & PAGE
+--==================================================
+
+local ScriptData = {
+    { Name = "Lennon", URL = "https://raw.githubusercontent.com/lennonxscripts/lennonhubv3/refs/heads/main/stealanegg.lua", Key = false },
+    { Name = "Miranda", URL = "https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/mirandaafk.lua", Key = false },
+    { Name = "Zeroin Hub", URL = "https://zeroinhub.com/api/script", Key = false },
+    { Name = "Void Shell", URL = "https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau", Key = false },
+    { Name = "Chili Hub", URL = "https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua", Key = false },
+    { Name = "Bloxy", URL = "https://raw.githubusercontent.com/bloxteam/bloxy/main/loader.lua", Key = false },
+    { Name = "Skibidi", URL = "https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua", Key = false },
+    { Name = "Oxide Hub", URL = "https://pastefy.app/aIzaPmW9/raw", Key = false },
+    { Name = "Valinc", URL = "https://api.valincsyndicate.com/v1/releases/5502cba03703f4a3628d522d396b80d8.lua", Key = false },
+    { Name = "Clout Hub", URL = "https://raw.githubusercontent.com/ClouthubOnTop/Loader/main/main.lua", Key = false },
+    { Name = "Speed Hub", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", Key = true },
+    { Name = "BigFroot", URL = "https://raw.githubusercontent.com/hanniii1/Loader/refs/heads/main/BFLoader.lua", Key = true },
+    { Name = "Clover Hub", URL = "https://raw.githubusercontent.com/ronnei/skibidi/refs/heads/main/CloverHub-keyles.lua", Key = true },
+    { Name = "Ajjans Hub", URL = "https://api.luarmor.net/files/v4/loaders/359e97f8618e9008afe5f496184ebb7c.lua", Key = true },
+    { Name = "Frost Hub", URL = "https://raw.githubusercontent.com/Frost-GG-Hud/Scripts/main/FrostHubLauncher.lua", Key = true },
+    { Name = "Axon Hub", URL = "https://api.luarmor.net/files/v3/loaders/97c3f6db55a2cf72141537a85458e5a7.lua", Key = true },
+    { Name = "Lumin Hub", URL = "http://luminon.top/loader.lua", Key = true },
+    { Name = "Solix Hub", URL = "https://raw.githubusercontent.com/bao8jl/solixhub/main/loader", Key = true },
+    { Name = "OnHub", URL = "https://raw.githubusercontent.com/davizin713/ONhub/refs/heads/main/script.lua", Key = true },
+    { Name = "Vantage Hub", URL = "https://raw.githubusercontent.com/MisterNovitski/Vantage/refs/heads/main/mm2.txt", Key = true }
+}
+
+local SearchBox = Instance.new("TextBox")
+
+SearchBox.Size = UDim2.new(1,-6,0,48)
+SearchBox.BackgroundColor3 = Theme.Card
+SearchBox.BorderSizePixel = 0
+SearchBox.PlaceholderText = "🔎  Search script..."
+SearchBox.PlaceholderColor3 = Theme.DarkGray
+SearchBox.Text = ""
+SearchBox.TextColor3 = Theme.White
+SearchBox.Font = Enum.Font.GothamMedium
+SearchBox.TextSize = 12
+SearchBox.ClearTextOnFocus = false
+SearchBox.Parent = Pages.Script
+
+Corner(SearchBox,8)
+WhiteStroke(SearchBox)
+
+local SearchPadding = Instance.new("UIPadding")
+SearchPadding.PaddingLeft = UDim.new(0,13)
+SearchPadding.Parent = SearchBox
+
+local ScriptList = Instance.new("ScrollingFrame")
+
+ScriptList.Size = UDim2.new(1,-6,1,-56)
+ScriptList.Position = UDim2.fromOffset(0,56)
+ScriptList.BackgroundTransparency = 1
+ScriptList.BorderSizePixel = 0
+ScriptList.ScrollBarThickness = 3
+ScriptList.ScrollBarImageColor3 = Color3.fromRGB(170,170,175)
+ScriptList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+ScriptList.Parent = Pages.Script
+
+local ScriptLayout = Instance.new("UIListLayout")
+
+ScriptLayout.Padding = UDim.new(0,7)
+ScriptLayout.Parent = ScriptList
+
+local function CreateScriptCard(data)
+    local Card = Instance.new("Frame")
+
+    Card.Name = "ScriptCard"
+    Card.Size = UDim2.new(1,-2,0,78)
+    Card.BackgroundColor3 = Theme.Card
+    Card.BorderSizePixel = 0
+
+    Corner(Card,9)
+    WhiteStroke(Card)
+
+    local Line = Instance.new("Frame")
+
+    Line.Name = "AccentLine"
+    Line.Size = UDim2.fromOffset(3,52)
+    Line.Position = UDim2.fromOffset(0,13)
+    Line.BackgroundColor3 = Theme.Accent
+    Line.BorderSizePixel = 0
+    Line.Parent = Card
+
+    Corner(Line,3)
+
+    local Name = Instance.new("TextLabel")
+
+    Name.Name = "ScriptName"
+    Name.BackgroundTransparency = 1
+    Name.Size = UDim2.new(1,-155,0,27)
+    Name.Position = UDim2.fromOffset(16,10)
+    Name.Font = Enum.Font.GothamMedium
+    Name.Text = data.Name
+    Name.TextColor3 = Theme.White
+    Name.TextSize = 14
+    Name.TextXAlignment = Enum.TextXAlignment.Left
+    Name.Parent = Card
+
+    local Ready = Instance.new("TextLabel")
+
+    Ready.BackgroundTransparency = 1
+    Ready.Size = UDim2.new(1,-155,0,20)
+    Ready.Position = UDim2.fromOffset(16,39)
+    Ready.Font = Enum.Font.GothamMedium
+    Ready.Text = data.Key and "● HAVE KEY" or "● NO KEY"
+    Ready.TextColor3 = data.Key and Color3.fromRGB(245,195,55) or Theme.Green
+    Ready.TextSize = 10
+    Ready.TextXAlignment = Enum.TextXAlignment.Left
+    Ready.Parent = Card
+
+    local Execute = Instance.new("TextButton")
+
+    Execute.Size = UDim2.fromOffset(110,44)
+    Execute.Position = UDim2.new(1,-122,0.5,-22)
+    Execute.BackgroundColor3 = Theme.Button
+    Execute.BorderSizePixel = 0
+    Execute.Text = "EXECUTE"
+    Execute.TextColor3 = Theme.White
+    Execute.Font = Enum.Font.GothamMedium
+    Execute.TextSize = 11
+    Execute.AutoButtonColor = false
+    Execute.Parent = Card
+
+    Corner(Execute,7)
+    WhiteStroke(Execute)
+
+    Execute.MouseButton1Click:Connect(function()
+        Execute.Text = "EXECUTED"
+        Execute.TextColor3 = Theme.Green
+
+        task.spawn(function()
+            pcall(function()
+                local source = game:HttpGet(data.URL)
+                local loaded = loadstring(source)
+                if loaded then
+                    loaded()
+                end
+            end)
+        end)
+
+        task.wait(2)
+
+        Execute.Text = "EXECUTE"
+        Execute.TextColor3 = Theme.White
+    end)
+
+    return Card
+end
+
+for _,data in ipairs(ScriptData) do
+    CreateScriptCard(data).Parent = ScriptList
+end
+
+--==================================================
+-- SHADER PAGE
+--==================================================
+
+local ShaderScroll = Instance.new("ScrollingFrame")
+ShaderScroll.Size = UDim2.new(1,0,1,0)
+ShaderScroll.BackgroundTransparency = 1
+ShaderScroll.BorderSizePixel = 0
+ShaderScroll.ScrollBarThickness = 3
+ShaderScroll.ScrollBarImageColor3 = Color3.fromRGB(170,170,175)
+ShaderScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+ShaderScroll.CanvasSize = UDim2.new(0,0,0,0)
+ShaderScroll.Parent = Pages.Shader
+
+local ShaderListLayout = Instance.new("UIListLayout")
+ShaderListLayout.Padding = UDim.new(0,8)
+ShaderListLayout.Parent = ShaderScroll
+
+local ShaderTitle = Instance.new("TextLabel")
+ShaderTitle.BackgroundTransparency = 1
+ShaderTitle.Size = UDim2.new(1,-10,0,34)
+ShaderTitle.Font = Enum.Font.GothamMedium
+ShaderTitle.Text = "🌆  Graphics & Shaders"
+ShaderTitle.TextColor3 = Theme.White
+ShaderTitle.TextSize = 16
+ShaderTitle.TextXAlignment = Enum.TextXAlignment.Left
+ShaderTitle.Parent = ShaderScroll
+
+local function CreateShaderButton(name, desc, callback)
+    local ShaderCard = Instance.new("Frame")
+    ShaderCard.Size = UDim2.new(1,-10,0,105)
+    ShaderCard.BackgroundColor3 = Theme.Card
+    ShaderCard.BorderSizePixel = 0
+    ShaderCard.Parent = ShaderScroll
+
+    Corner(ShaderCard,9)
+    WhiteStroke(ShaderCard)
+
+    local ShaderInfo = Instance.new("TextLabel")
+    ShaderInfo.BackgroundTransparency = 1
+    ShaderInfo.Size = UDim2.new(1,-20,0,35)
+    ShaderInfo.Position = UDim2.fromOffset(10,8)
+    ShaderInfo.Font = Enum.Font.GothamMedium
+    ShaderInfo.Text = name.."\n"..desc
+    ShaderInfo.TextColor3 = Theme.Silver
+    ShaderInfo.TextSize = 11
+    ShaderInfo.TextXAlignment = Enum.TextXAlignment.Left
+    ShaderInfo.Parent = ShaderCard
+
+    local ShaderExecute = Instance.new("TextButton")
+    ShaderExecute.Size = UDim2.new(1,-20,0,38)
+    ShaderExecute.Position = UDim2.fromOffset(10,55)
+    ShaderExecute.BackgroundColor3 = Color3.fromRGB(235,235,238)
+    ShaderExecute.BorderSizePixel = 0
+    ShaderExecute.Text = "EXECUTE"
+    ShaderExecute.TextColor3 = Color3.fromRGB(10,10,12)
+    ShaderExecute.Font = Enum.Font.GothamMedium
+    ShaderExecute.TextSize = 11
+    ShaderExecute.AutoButtonColor = false
+    ShaderExecute.Parent = ShaderCard
+
+    Corner(ShaderExecute,8)
+    WhiteStroke(ShaderExecute)
+
+    ShaderExecute.MouseButton1Click:Connect(function()
+        ShaderExecute.Text = "EXECUTED"
+        ShaderExecute.TextColor3 = Theme.Green
+
+        task.spawn(function()
+            pcall(callback)
+        end)
+
+        task.wait(2)
+        ShaderExecute.Text = "EXECUTE"
+        ShaderExecute.TextColor3 = Color3.fromRGB(10,10,12)
+    end)
+end
+
+local function GetOrCreateEffect(className, name)
+    local Lighting = game:GetService("Lighting")
+    local effect = Lighting:FindFirstChild(name)
+    if not effect then
+        effect = Instance.new(className)
+        effect.Name = name
+        effect.Parent = Lighting
+    end
+    return effect
+end
+
+CreateShaderButton("Daytime Shader", "Bright daylight with crisp shadows and high-end clarity.", function()
+    local Lighting = game:GetService("Lighting")
+    Lighting.Brightness = 3
+    Lighting.ClockTime = 14
+    Lighting.FogEnd = 100000
+    Lighting.GlobalShadows = true
+    Lighting.OutdoorAmbient = Color3.fromRGB(150, 150, 150)
+    Lighting.ColorShift_Top = Color3.fromRGB(255, 255, 255)
+    Lighting.ShadowSoftness = 0.2
+
+    local cc = GetOrCreateEffect("ColorCorrectionEffect", "NexusCC_Day")
+    cc.Saturation = 0.15
+    cc.Contrast = 0.1
+    cc.TintColor = Color3.fromRGB(255, 255, 255)
+
+    local bloom = GetOrCreateEffect("BloomEffect", "NexusBloom_Day")
+    bloom.Intensity = 0.1
+    bloom.Threshold = 0.95
+end)
+
+CreateShaderButton("Sunset Shader", "Stunning golden hour sunset with rich orange tones.", function()
+    local Lighting = game:GetService("Lighting")
+    Lighting.Brightness = 2.2
+    Lighting.ClockTime = 17.7
+    Lighting.FogEnd = 80000
+    Lighting.GlobalShadows = true
+    Lighting.OutdoorAmbient = Color3.fromRGB(190, 115, 65)
+    Lighting.ColorShift_Top = Color3.fromRGB(255, 165, 90)
+    Lighting.ShadowSoftness = 0.4
+
+    local cc = GetOrCreateEffect("ColorCorrectionEffect", "NexusCC_Sunset")
+    cc.Saturation = 0.25
+    cc.Contrast = 0.15
+    cc.TintColor = Color3.fromRGB(255, 210, 180)
+
+    local sun = GetOrCreateEffect("SunRaysEffect", "NexusSun_Sunset")
+    sun.Intensity = 0.25
+    sun.Spread = 0.8
+end)
+
+CreateShaderButton("Night Shader", "Atmospheric deep night with blue moonlight ambience.", function()
+    local Lighting = game:GetService("Lighting")
+    Lighting.Brightness = 0.2
+    Lighting.ClockTime = 0
+    Lighting.FogEnd = 40000
+    Lighting.GlobalShadows = true
+    Lighting.OutdoorAmbient = Color3.fromRGB(15, 25, 55)
+    Lighting.ColorShift_Top = Color3.fromRGB(40, 70, 140)
+    Lighting.ShadowSoftness = 0.5
+
+    local cc = GetOrCreateEffect("ColorCorrectionEffect", "NexusCC_Night")
+    cc.Saturation = -0.1
+    cc.Contrast = 0.2
+    cc.TintColor = Color3.fromRGB(180, 205, 255)
+end)
+
+CreateShaderButton("Cloudy Shader", "Gloomy, overcast atmosphere with soft overcast lighting.", function()
+    local Lighting = game:GetService("Lighting")
+    Lighting.Brightness = 1.1
+    Lighting.ClockTime = 11
+    Lighting.FogEnd = 15000
+    Lighting.FogColor = Color3.fromRGB(140, 145, 155)
+    Lighting.GlobalShadows = true
+    Lighting.OutdoorAmbient = Color3.fromRGB(95, 100, 110)
+    Lighting.ColorShift_Top = Color3.fromRGB(190, 195, 205)
+    Lighting.ShadowSoftness = 0.8
+
+    local cc = GetOrCreateEffect("ColorCorrectionEffect", "NexusCC_Cloudy")
+    cc.Saturation = -0.2
+    cc.Contrast = 0.05
+    cc.TintColor = Color3.fromRGB(210, 215, 225)
+end)
+
+CreateShaderButton("Shore Shader", "Vibrant, vivid coastal lighting with turquoise enhancement.", function()
+    local Lighting = game:GetService("Lighting")
+    Lighting.Brightness = 2.5
+    Lighting.ClockTime = 13
+    Lighting.FogEnd = 100000
+    Lighting.GlobalShadows = true
+    Lighting.OutdoorAmbient = Color3.fromRGB(115, 165, 195)
+    Lighting.ColorShift_Top = Color3.fromRGB(220, 245, 255)
+    Lighting.ShadowSoftness = 0.25
+
+    local cc = GetOrCreateEffect("ColorCorrectionEffect", "NexusCC_Shore")
+    cc.Saturation = 0.35
+    cc.Contrast = 0.2
+    cc.TintColor = Color3.fromRGB(225, 245, 255)
+
+    local bloom = GetOrCreateEffect("BloomEffect", "NexusBloom_Shore")
+    bloom.Intensity = 0.2
+    bloom.Threshold = 0.8
+end)
+
+--==================================================
+-- AVATAR PAGE
+--==================================================
+
+local AvatarTitle = Instance.new("TextLabel")
+
+AvatarTitle.BackgroundTransparency = 1
+AvatarTitle.Size = UDim2.new(1,-10,0,34)
+AvatarTitle.Position = UDim2.fromOffset(5,5)
+AvatarTitle.Font = Enum.Font.GothamMedium
+AvatarTitle.Text = "👤  Universal Avatar & Animations"
+AvatarTitle.TextColor3 = Theme.White
+AvatarTitle.TextSize = 16
+AvatarTitle.TextXAlignment = Enum.TextXAlignment.Left
+AvatarTitle.Parent = Pages.Avatar
+
+local AvatarBox = Instance.new("TextBox")
+
+AvatarBox.Size = UDim2.new(1,-10,0,48)
+AvatarBox.Position = UDim2.fromOffset(5,45)
+AvatarBox.BackgroundColor3 = Theme.Card
+AvatarBox.BorderSizePixel = 0
+AvatarBox.PlaceholderText = "Enter Roblox username..."
+AvatarBox.PlaceholderColor3 = Theme.DarkGray
+AvatarBox.Text = ""
+AvatarBox.TextColor3 = Theme.White
+AvatarBox.Font = Enum.Font.GothamMedium
+AvatarBox.TextSize = 12
+AvatarBox.Parent = Pages.Avatar
+
+Corner(AvatarBox,8)
+WhiteStroke(AvatarBox)
+
+local AvatarPadding = Instance.new("UIPadding")
+AvatarPadding.PaddingLeft = UDim.new(0,12)
+AvatarPadding.Parent = AvatarBox
+
+local AvatarButton = Instance.new("TextButton")
+
+AvatarButton.Size = UDim2.new(1,-10,0,47)
+AvatarButton.Position = UDim2.fromOffset(5,103)
+AvatarButton.BackgroundColor3 = Color3.fromRGB(235,235,238)
+AvatarButton.BorderSizePixel = 0
+AvatarButton.Text = "APPLY AVATAR"
+AvatarButton.TextColor3 = Color3.fromRGB(10,10,12)
+AvatarButton.Font = Enum.Font.GothamMedium
+AvatarButton.TextSize = 11
+AvatarButton.Parent = Pages.Avatar
+
+Corner(AvatarButton,8)
+WhiteStroke(AvatarButton)
+
+AvatarButton.MouseButton1Click:Connect(function()
+    local targetUser = AvatarBox.Text
+    if targetUser ~= "" then
+        AvatarButton.Text = "APPLYING..."
+        task.spawn(function()
+            pcall(function()
+                local userId = Players:GetUserIdFromNameAsync(targetUser)
+                if userId and LocalPlayer.Character then
+                    LocalPlayer.Character:ApplyDescription(Players:GetHumanoidDescriptionFromUserId(userId))
+                end
+            end)
+            task.wait(1)
+            AvatarButton.Text = "AVATAR APPLIED!"
+            task.wait(2)
+            AvatarButton.Text = "APPLY AVATAR"
+        end)
+    end
+end)
+
+local AnimButton = Instance.new("TextButton")
+
+AnimButton.Size = UDim2.new(1,-10,0,47)
+AnimButton.Position = UDim2.fromOffset(5,158)
+AnimButton.BackgroundColor3 = Theme.Card
+AnimButton.BorderSizePixel = 0
+AnimButton.Text = "▶ EXECUTE ANIMATIONS"
+AnimButton.TextColor3 = Theme.White
+AnimButton.Font = Enum.Font.GothamMedium
+AnimButton.TextSize = 11
+AnimButton.Parent = Pages.Avatar
+
+Corner(AnimButton,8)
+WhiteStroke(AnimButton)
+
+AnimButton.MouseButton1Click:Connect(function()
+    AnimButton.Text = "EXECUTED"
+    AnimButton.TextColor3 = Theme.Green
+    task.spawn(function()
+        pcall(function()
+            loadstring(game:HttpGet("https://pastebin.com/raw/BLz4yxAQ"))()
+        end)
+    end)
+    task.wait(2)
+    AnimButton.Text = "▶ EXECUTE ANIMATIONS"
+    AnimButton.TextColor3 = Theme.White
+end)
+
+--==================================================
+-- ANTI HIT PAGE
+--==================================================
+
+local AntiHitTitle = Instance.new("TextLabel")
+
+AntiHitTitle.BackgroundTransparency = 1
+AntiHitTitle.Size = UDim2.new(1,-10,0,34)
+AntiHitTitle.Position = UDim2.fromOffset(5,5)
+AntiHitTitle.Font = Enum.Font.GothamMedium
+AntiHitTitle.Text = "🛡  Anti Hit"
+AntiHitTitle.TextColor3 = Theme.White
+AntiHitTitle.TextSize = 16
+AntiHitTitle.TextXAlignment = Enum.TextXAlignment.Left
+AntiHitTitle.Parent = Pages.AntiHit
+
+local AntiHitCard = Instance.new("Frame")
+
+AntiHitCard.Size = UDim2.new(1,-10,0,145)
+AntiHitCard.Position = UDim2.fromOffset(5,46)
+AntiHitCard.BackgroundColor3 = Theme.Card
+AntiHitCard.BorderSizePixel = 0
+AntiHitCard.Parent = Pages.AntiHit
+
+Corner(AntiHitCard,9)
+WhiteStroke(AntiHitCard)
+
+local AntiHitInfo = Instance.new("TextLabel")
+
+AntiHitInfo.BackgroundTransparency = 1
+AntiHitInfo.Size = UDim2.new(1,-20,0,55)
+AntiHitInfo.Position = UDim2.fromOffset(10,10)
+AntiHitInfo.Font = Enum.Font.GothamMedium
+AntiHitInfo.Text = "Anti Hit Protection\nProtect your character from hit effects."
+AntiHitInfo.TextColor3 = Theme.Silver
+AntiHitInfo.TextSize = 11
+AntiHitInfo.TextXAlignment = Enum.TextXAlignment.Left
+AntiHitInfo.Parent = AntiHitCard
+
+local AntiHitExecute = Instance.new("TextButton")
+
+AntiHitExecute.Size = UDim2.new(1,-20,0,50)
+AntiHitExecute.Position = UDim2.fromOffset(10,86)
+AntiHitExecute.BackgroundColor3 = Color3.fromRGB(235,235,238)
+AntiHitExecute.BorderSizePixel = 0
+AntiHitExecute.Text = "EXECUTE ANTI HIT"
+AntiHitExecute.TextColor3 = Color3.fromRGB(10,10,12)
+AntiHitExecute.Font = Enum.Font.GothamMedium
+AntiHitExecute.TextSize = 14
+AntiHitExecute.AutoButtonColor = false
+AntiHitExecute.Parent = AntiHitCard
+
+Corner(AntiHitExecute,8)
+WhiteStroke(AntiHitExecute)
+
+AntiHitExecute.MouseButton1Click:Connect(function()
+    AntiHitExecute.Text = "EXECUTED"
+    AntiHitExecute.TextColor3 = Theme.Green
+
+    task.spawn(function()
+        pcall(function()
+            getgenv().script_key = "KEY"
+            loadstring(game:HttpGet("https://api.getpolsec.com/scripts/hosted/6582551b42d21c6b7eb55f1d76d8d50ce53cb35592093d6615b5e83437594dc0.lua"))()
+        end)
+    end)
+
+    task.wait(2)
+    AntiHitExecute.Text = "EXECUTE ANTI HIT"
+    AntiHitExecute.TextColor3 = Color3.fromRGB(10,10,12)
+end)
+
+--==================================================
+-- ANTI LAG PAGE
+--==================================================
+
+local AntiLagTitle = Instance.new("TextLabel")
+
+AntiLagTitle.BackgroundTransparency = 1
+AntiLagTitle.Size = UDim2.new(1,-10,0,34)
+AntiLagTitle.Position = UDim2.fromOffset(5,5)
+AntiLagTitle.Font = Enum.Font.GothamMedium
+AntiLagTitle.Text = "⚡  Anti Lag"
+AntiLagTitle.TextColor3 = Theme.White
+AntiLagTitle.TextSize = 16
+AntiLagTitle.TextXAlignment = Enum.TextXAlignment.Left
+AntiLagTitle.Parent = Pages.AntiLag
+
+local AntiLagCard = Instance.new("Frame")
+
+AntiLagCard.Size = UDim2.new(1,-10,0,145)
+AntiLagCard.Position = UDim2.fromOffset(5,46)
+AntiLagCard.BackgroundColor3 = Theme.Card
+AntiLagCard.BorderSizePixel = 0
+AntiLagCard.Parent = Pages.AntiLag
+
+Corner(AntiLagCard,9)
+WhiteStroke(AntiLagCard)
+
+local AntiLagInfo = Instance.new("TextLabel")
+
+AntiLagInfo.BackgroundTransparency = 1
+AntiLagInfo.Size = UDim2.new(1,-20,0,55)
+AntiLagInfo.Position = UDim2.fromOffset(10,10)
+AntiLagInfo.Font = Enum.Font.GothamMedium
+AntiLagInfo.Text = "Performance Optimization\nReduce unnecessary effects and improve performance."
+AntiLagInfo.TextColor3 = Theme.Silver
+AntiLagInfo.TextSize = 11
+AntiLagInfo.TextXAlignment = Enum.TextXAlignment.Left
+AntiLagInfo.Parent = AntiLagCard
+
+local AntiLagStatus = Instance.new("TextLabel")
+
+AntiLagStatus.BackgroundTransparency = 1
+AntiLagStatus.Size = UDim2.new(1,-20,0,20)
+AntiLagStatus.Position = UDim2.fromOffset(10,64)
+AntiLagStatus.Font = Enum.Font.GothamMedium
+AntiLagStatus.Text = "● READY TO EXECUTE"
+AntiLagStatus.TextColor3 = Theme.Green
+AntiLagStatus.TextSize = 10
+AntiLagStatus.TextXAlignment = Enum.TextXAlignment.Left
+AntiLagStatus.Parent = AntiLagCard
+
+local AntiLagButton = Instance.new("TextButton")
+
+AntiLagButton.Size = UDim2.new(1,-20,0,43)
+AntiLagButton.Position = UDim2.fromOffset(10,92)
+AntiLagButton.BackgroundColor3 = Color3.fromRGB(235,235,238)
+AntiLagButton.BorderSizePixel = 0
+AntiLagButton.Text = "⚡  EXECUTE ANTI LAG"
+AntiLagButton.TextColor3 = Color3.fromRGB(10,10,12)
+AntiLagButton.Font = Enum.Font.GothamMedium
+AntiLagButton.TextSize = 11
+AntiLagButton.AutoButtonColor = false
+AntiLagButton.Parent = AntiLagCard
+
+Corner(AntiLagButton,8)
+WhiteStroke(AntiLagButton)
+
+AntiLagButton.MouseButton1Click:Connect(function()
+    AntiLagButton.Text = "EXECUTED"
+    AntiLagStatus.Text = "● ACTIVE"
+    AntiLagStatus.TextColor3 = Theme.Green
+
+    task.spawn(function()
+        pcall(function()
+            loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Performance-Overhaul-I-Universal-Anti-Lagger-128625"))()
+        end)
+    end)
+
+    task.wait(2)
+    AntiLagButton.Text = "⚡  EXECUTE ANTI LAG"
+    AntiLagButton.TextColor3 = Color3.fromRGB(10,10,12)
+end)
+
+--==================================================
+-- SERVER FINDER PAGE
+--==================================================
+
+local ServerTitle = Instance.new("TextLabel")
+
+ServerTitle.BackgroundTransparency = 1
+ServerTitle.Size = UDim2.new(1,-10,0,34)
+ServerTitle.Position = UDim2.fromOffset(5,5)
+ServerTitle.Font = Enum.Font.GothamMedium
+ServerTitle.Text = "🔎  Server Finder"
+ServerTitle.TextColor3 = Theme.White
+ServerTitle.TextSize = 16
+ServerTitle.TextXAlignment = Enum.TextXAlignment.Left
+ServerTitle.Parent = Pages.Server
+
+local ServerHop = Instance.new("TextButton")
+
+ServerHop.Size = UDim2.new(1,-10,0,48)
+ServerHop.Position = UDim2.fromOffset(5,48)
+ServerHop.BackgroundColor3 = Theme.Card
+ServerHop.BorderSizePixel = 0
+ServerHop.Text = "🌐  CUSTOM SERVER HOP"
+ServerHop.TextColor3 = Theme.White
+ServerHop.Font = Enum.Font.GothamMedium
+ServerHop.TextSize = 11
+ServerHop.Parent = Pages.Server
+
+Corner(ServerHop,8)
+WhiteStroke(ServerHop)
+
+ServerHop.MouseButton1Click:Connect(function()
+    ServerHop.Text = "EXECUTED"
+    task.spawn(function()
+        pcall(function()
+            loadstring(game:HttpGet("https://pastefy.app/YoZocJ8O/raw"))()
+        end)
+    end)
+    task.wait(2)
+    ServerHop.Text = "🌐  CUSTOM SERVER HOP"
+end)
+
+local ServerHop2 = Instance.new("TextButton")
+
+ServerHop2.Size = UDim2.new(1,-10,0,48)
+ServerHop2.Position = UDim2.fromOffset(5,104)
+ServerHop2.BackgroundColor3 = Theme.Card
+ServerHop2.BorderSizePixel = 0
+ServerHop2.Text = "🌐  SERVER HOP V2"
+ServerHop2.TextColor3 = Theme.White
+ServerHop2.Font = Enum.Font.GothamMedium
+ServerHop2.TextSize = 11
+ServerHop2.Parent = Pages.Server
+
+Corner(ServerHop2,8)
+WhiteStroke(ServerHop2)
+
+ServerHop2.MouseButton1Click:Connect(function()
+    ServerHop2.Text = "EXECUTED"
+    task.spawn(function()
+        pcall(function()
+            loadstring(game:HttpGet("https://rawusercontent.com/kiddohas/ServerHopV2/refs/heads/main/SERVEHOPV2"))()
+        end)
+    end)
+    task.wait(2)
+    ServerHop2.Text = "🌐  SERVER HOP V2"
+end)
+
+--==================================================
+-- SEARCH FILTER
+--==================================================
+
+SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local search = string.lower(SearchBox.Text)
+
+    for _, child in ipairs(ScriptList:GetChildren()) do
+        if child:IsA("Frame") and child.Name == "ScriptCard" then
+            local nameLabel = child:FindFirstChild("ScriptName")
+            if nameLabel then
+                local name = string.lower(nameLabel.Text)
+                child.Visible = (search == "" or string.find(name, search, 1, true) ~= nil)
+            end
+        end
+    end
+end)
+
+--==================================================
+-- TAB CONNECTIONS
+--==================================================
+
+HomeTab.MouseButton1Click:Connect(function() SelectTab("Home") end)
+ScriptTab.MouseButton1Click:Connect(function() SelectTab("Script") end)
+AvatarTab.MouseButton1Click:Connect(function() SelectTab("Avatar") end)
+AntiHitTab.MouseButton1Click:Connect(function() SelectTab("AntiHit") end)
+AntiLagTab.MouseButton1Click:Connect(function() SelectTab("AntiLag") end)
+ServerTab.MouseButton1Click:Connect(function() SelectTab("Server") end)
+ShaderTab.MouseButton1Click:Connect(function() SelectTab("Shader") end)
+
+--==================================================
+-- MINIMIZED BAR
+--==================================================
+
+local MinimizedBar = Instance.new("TextButton")
+
+MinimizedBar.Name = "MinimizedBar"
+MinimizedBar.Size = UDim2.fromOffset(330,42)
+MinimizedBar.Position = UDim2.new(0.5, 0, 0, 45)
+MinimizedBar.AnchorPoint = Vector2.new(0.5, 0)
+MinimizedBar.BackgroundColor3 = Theme.Background
+MinimizedBar.BorderSizePixel = 0
+MinimizedBar.Text = "⚡ NEXUS HUB | PREMIUM FREE SCRIPT"
+MinimizedBar.TextColor3 = Theme.White
+MinimizedBar.Font = Enum.Font.GothamMedium
+MinimizedBar.TextSize = 11
+MinimizedBar.Visible = false
+MinimizedBar.AutoButtonColor = false
+MinimizedBar.Parent = ScreenGui
+
+Corner(MinimizedBar,8)
+WhiteStroke(MinimizedBar)
+
+local function UpdateMinimizedBar()
+    Camera = workspace.CurrentCamera
+
+    if not Camera then
+        return
+    end
+
+    local screenWidth = Camera.ViewportSize.X
+    local width = math.max(180, math.min(330, screenWidth - 16))
+
+    MinimizedBar.Size = UDim2.fromOffset(width, 42)
+
+    if screenWidth < 300 then
+        MinimizedBar.TextSize = 7
+    elseif screenWidth < 380 then
+        MinimizedBar.TextSize = 9
+    else
+        MinimizedBar.TextSize = 11
+    end
+end
+
+UpdateMinimizedBar()
+
+if Camera then
+    Camera:GetPropertyChangedSignal("ViewportSize"):Connect(UpdateMinimizedBar)
+end
+
+local MinimizedDragging = false
+local MinimizedDragStart
+local MinimizedStartPos
+
+MinimizedBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        MinimizedDragging = true
+        MinimizedDragStart = input.Position
+        MinimizedStartPos = MinimizedBar.AbsolutePosition
+
+        MinimizedBar.AnchorPoint = Vector2.new(0, 0)
+        MinimizedBar.Position = UDim2.fromOffset(MinimizedStartPos.X, MinimizedStartPos.Y)
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                MinimizedDragging = false
+            end
+        end)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if MinimizedDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local Delta = input.Position - MinimizedDragStart
+        MinimizedBar.Position = UDim2.fromOffset(
+            MinimizedStartPos.X + Delta.X,
+            MinimizedStartPos.Y + Delta.Y
+        )
+    end
+end)
+
+Minimize.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    MinimizedBar.Visible = true
+    UpdateMinimizedBar()
+end)
+
+MinimizedBar.MouseButton1Click:Connect(function()
+    if MinimizedDragging then return end
+
+    MinimizedBar.Visible = false
+    MainFrame.Visible = true
+    UpdateMobileScale()
+end)
+
+--==================================================
+-- CLOSE CONFIRMATION
+--==================================================
+
+local Confirm = Instance.new("Frame")
+
+Confirm.Size = UDim2.fromScale(1,1)
+Confirm.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Confirm.BackgroundTransparency = 0.3
+Confirm.Visible = false
+Confirm.ZIndex = 100
+Confirm.Parent = ScreenGui
+
+local ConfirmBox = Instance.new("Frame")
+
+ConfirmBox.Size = UDim2.fromOffset(320,155)
+ConfirmBox.Position = UDim2.fromScale(0.5,0.5)
+ConfirmBox.AnchorPoint = Vector2.new(0.5,0.5)
+ConfirmBox.BackgroundColor3 = Theme.Background
+ConfirmBox.BorderSizePixel = 0
+ConfirmBox.ZIndex = 101
+ConfirmBox.Parent = Confirm
+
+Corner(ConfirmBox,10)
+WhiteStroke(ConfirmBox)
+
+local ConfirmText = Instance.new("TextLabel")
+
+ConfirmText.BackgroundTransparency = 1
+ConfirmText.Size = UDim2.new(1,-20,0,45)
+ConfirmText.Position = UDim2.fromOffset(10,12)
+ConfirmText.Text = "Close NEXUS HUB?"
+ConfirmText.TextColor3 = Theme.White
+ConfirmText.Font = Enum.Font.GothamMedium
+TestTextSize = 15
+ConfirmText.TextSize = 15
+ConfirmText.ZIndex = 102
+ConfirmText.Parent = ConfirmBox
+
+local Yes = Instance.new("TextButton")
+
+Yes.Size = UDim2.fromOffset(110,42)
+Yes.Position = UDim2.new(0.5,-120,1,-54)
+Yes.BackgroundColor3 = Theme.Red
+Yes.BorderSizePixel = 0
+Yes.Text = "CLOSE"
+Yes.TextColor3 = Theme.White
+Yes.Font = Enum.Font.GothamMedium
+Yes.TextSize = 10
+Yes.ZIndex = 102
+Yes.Parent = ConfirmBox
+
+Corner(Yes,7)
+WhiteStroke(Yes)
+
+local No = Instance.new("TextButton")
+
+No.Size = UDim2.fromOffset(110,42)
+No.Position = UDim2.new(0.5,10,1,-54)
+No.BackgroundColor3 = Theme.Button
+No.BorderSizePixel = 0
+No.Text = "CANCEL"
+No.TextColor3 = Theme.White
+No.Font = Enum.Font.GothamMedium
+No.TextSize = 10
+No.ZIndex = 102
+No.Parent = ConfirmBox
+
+Corner(No,7)
+WhiteStroke(No)
+
+Close.MouseButton1Click:Connect(function()
+    Confirm.Visible = true
+end)
+
+No.MouseButton1Click:Connect(function()
+    Confirm.Visible = false
+end)
+
+Yes.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+--==================================================
+-- FPS / PING MONITOR
+--==================================================
+
+local Frames = 0
+local FPS = 0
+local FPSTimer = 0
+
+RunService.RenderStepped:Connect(function(dt)
+    Frames += 1
+    FPSTimer += dt
+
+    if FPSTimer >= 0.5 then
+        FPS = math.floor(Frames / FPSTimer)
+        Frames = 0
+        FPSTimer = 0
+
+        local ping = 0
+
+        pcall(function()
+            ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
+        end)
+
+        StatusLabel.Text = "FPS: "..FPS.."  |  Ping: "..ping.."ms"
+    end
+end)
+
+--==================================================
+-- RIGHT CONTROL TOGGLE
+--==================================================
+
+UserInputService.InputBegan:Connect(function(input,processed)
+    if processed then
+        return
+    end
+
+    if input.KeyCode == Enum.KeyCode.RightControl then
+        if MainFrame.Visible then
+            MainFrame.Visible = false
+            MinimizedBar.Visible = true
+        else
+            MinimizedBar.Visible = false
+            MainFrame.Visible = true
+            UpdateMobileScale()
+        end
+    end
+end)
+
+--==================================================
+-- INITIALIZATION SEQUENCE
+--==================================================
+
+task.spawn(function()
+    local steps = {
+        {25,"Loading interface..."},
+        {50,"Loading scripts..."},
+        {75,"Preparing dashboard..."},
+        {100,"NEXUS HUB ready!"}
+    }
+
+    for _,step in ipairs(steps) do
+        local percent = step[1]
+        local status = step[2]
+
+        LoadingStatus.Text = status
+        LoadingPercent.Text = percent.."%"
+
+        Tween(LoadingBar, 0.35, {
+            Size = UDim2.new(percent/100, 0, 1, 0)
+        })
+
+        task.wait(0.35)
+    end
+
+    task.wait(0.35)
+
+    Tween(LoadingFrame, 0.3, {
+        BackgroundTransparency = 1
+    })
+
+    for _,obj in ipairs(LoadingFrame:GetDescendants()) do
+        if obj:IsA("TextLabel") then
+            Tween(obj, 0.25, { TextTransparency = 1 })
+        elseif obj:IsA("Frame") then
+            Tween(obj, 0.25, { BackgroundTransparency = 1 })
+        elseif obj:IsA("UIStroke") then
+            Tween(obj, 0.25, { Transparency = 1 })
+        end
+    end
+
+    task.wait(0.35)
+
+    LoadingFrame:Destroy()
+    MainFrame.Visible = true
+    SelectTab("Home")
+    ApplyTheme("Night Blue")
+    UpdateMobileScale()
+end)
